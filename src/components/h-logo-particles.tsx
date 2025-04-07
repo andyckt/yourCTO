@@ -97,6 +97,7 @@ export default function HParticles() {
 
     function createInitialParticles() {
       const baseParticleCount = 7000
+      if (!canvas) return;
       const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       for (let i = 0; i < particleCount; i++) {
         const particle = createParticle()
@@ -151,6 +152,7 @@ export default function HParticles() {
       }
 
       const baseParticleCount = 7000
+      if (!canvas) return;
       const targetParticleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       while (particles.length < targetParticleCount) {
         const newParticle = createParticle()
