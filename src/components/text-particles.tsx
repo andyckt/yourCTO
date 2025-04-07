@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
 
 interface TextParticlesProps {
   text?: string | string[];
@@ -20,11 +20,17 @@ export default function TextParticles({
   const isTouchingRef = useRef(false)
   const [isMobile, setIsMobile] = useState(false)
 
-  // Convert text to array of lines if it's a string
-  const textLines = Array.isArray(text) ? text : [text]
+  // Convert text to array of lines if it's a string (wrapped in useMemo)
+  const textLines = useMemo(() => 
+    Array.isArray(text) ? text : [text], 
+    [text]
+  )
   
-  // Convert scatteredColor to array of colors if it's a string
-  const colorArray = Array.isArray(scatteredColor) ? scatteredColor : Array(textLines.length).fill(scatteredColor)
+  // Convert scatteredColor to array of colors if it's a string (wrapped in useMemo)
+  const colorArray = useMemo(() => 
+    Array.isArray(scatteredColor) ? scatteredColor : Array(textLines.length).fill(scatteredColor), 
+    [scatteredColor, textLines.length]
+  )
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -78,9 +84,6 @@ export default function TextParticles({
       
       // Calculate the total height of all lines
       const totalHeight = textLines.length * fontSize * lineHeight
-      
-      // Center text vertically in the exact middle of the screen
-      const startY = canvas.height / 2 - (totalHeight / 2) + (fontSize / 2)
       
       // Clear line positions array
       linePositions = []
@@ -152,6 +155,8 @@ export default function TextParticles({
     function createInitialParticles() {
       // Calculate appropriate particle count based on screen size
       const baseParticleCount = 7000
+      // Safe check for canvas before using its properties
+      if (!canvas) return;
       const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       for (let i = 0; i < particleCount; i++) {
         const particle = createParticle()
@@ -206,6 +211,7 @@ export default function TextParticles({
       }
 
       const baseParticleCount = 7000
+      if (!canvas) return;
       const targetParticleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       while (particles.length < targetParticleCount) {
         const newParticle = createParticle()

@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useRef, useEffect, useState } from 'react'
-import Link from 'next/link'
 import { AWS_LOGO_PATH } from './aws-logo-path'
 
 export default function Component() {
@@ -111,11 +110,10 @@ export default function Component() {
       return Math.max(vercelScale, awsScale)
     }
 
-    function createParticle(scale: number) {
+    function createParticle() {
       if (!ctx || !canvas || !textImageData) return null
 
       const data = textImageData.data
-      const particleGap = 2
 
       for (let attempt = 0; attempt < 100; attempt++) {
         const x = Math.floor(Math.random() * canvas.width)
@@ -128,7 +126,6 @@ export default function Component() {
           const logoSpacing = isMobile ? 30 : 60
           const totalWidth = vercelLogoWidth + awsLogoWidth + logoSpacing
           const centerX = canvas.width / 2
-          const centerY = canvas.height / 2
           const isAWSLogo = x >= centerX + (totalWidth / 2) - awsLogoWidth
           return {
             x: x,
@@ -147,18 +144,18 @@ export default function Component() {
       return null
     }
 
-    function createInitialParticles(scale: number) {
+    function createInitialParticles() {
       const baseParticleCount = 7000 // Increased base count for higher density
       const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       for (let i = 0; i < particleCount; i++) {
-        const particle = createParticle(scale)
+        const particle = createParticle()
         if (particle) particles.push(particle)
       }
     }
 
     let animationFrameId: number
 
-    function animate(scale: number) {
+    function animate() {
       if (!ctx || !canvas) return
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.fillStyle = 'black'
@@ -192,7 +189,7 @@ export default function Component() {
 
         p.life--
         if (p.life <= 0) {
-          const newParticle = createParticle(scale)
+          const newParticle = createParticle()
           if (newParticle) {
             particles[i] = newParticle
           } else {
@@ -205,22 +202,22 @@ export default function Component() {
       const baseParticleCount = 7000
       const targetParticleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       while (particles.length < targetParticleCount) {
-        const newParticle = createParticle(scale)
+        const newParticle = createParticle()
         if (newParticle) particles.push(newParticle)
       }
 
-      animationFrameId = requestAnimationFrame(() => animate(scale))
+      animationFrameId = requestAnimationFrame(animate)
     }
 
-    const scale = createTextImage()
-    createInitialParticles(scale)
-    animate(scale)
+    const initialScale = createTextImage()
+    createInitialParticles()
+    animate()
 
     const handleResize = () => {
       updateCanvasSize()
-      const newScale = createTextImage()
+      createTextImage()
       particles = []
-      createInitialParticles(newScale)
+      createInitialParticles()
     }
 
     const handleMove = (x: number, y: number) => {
@@ -254,19 +251,26 @@ export default function Component() {
     }
 
     window.addEventListener('resize', handleResize)
-    canvas.addEventListener('mousemove', handleMouseMove)
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
-    canvas.addEventListener('mouseleave', handleMouseLeave)
-    canvas.addEventListener('touchstart', handleTouchStart)
-    canvas.addEventListener('touchend', handleTouchEnd)
+    
+    if (canvas) {
+      canvas.addEventListener('mousemove', handleMouseMove)
+      canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+      canvas.addEventListener('mouseleave', handleMouseLeave)
+      canvas.addEventListener('touchstart', handleTouchStart)
+      canvas.addEventListener('touchend', handleTouchEnd)
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize)
-      canvas.removeEventListener('mousemove', handleMouseMove)
-      canvas.removeEventListener('touchmove', handleTouchMove)
-      canvas.removeEventListener('mouseleave', handleMouseLeave)
-      canvas.removeEventListener('touchstart', handleTouchStart)
-      canvas.removeEventListener('touchend', handleTouchEnd)
+      
+      if (canvas) {
+        canvas.removeEventListener('mousemove', handleMouseMove)
+        canvas.removeEventListener('touchmove', handleTouchMove)
+        canvas.removeEventListener('mouseleave', handleMouseLeave)
+        canvas.removeEventListener('touchstart', handleTouchStart)
+        canvas.removeEventListener('touchend', handleTouchEnd)
+      }
+      
       cancelAnimationFrame(animationFrameId)
     }
   }, [isMobile])
