@@ -78,20 +78,14 @@ export default function TextParticles({
       
       // Calculate the total height of all lines
       const totalHeight = textLines.length * fontSize * lineHeight
-      
-      // Center text vertically in the exact middle of the screen
-      const startY = canvas.height / 2 - (totalHeight / 2) + (fontSize / 2)
+      const startY = canvas.height / 2 - totalHeight / 2 + fontSize / 2
       
       // Clear line positions array
       linePositions = []
       
       // Draw each line of text and record its vertical bounds
       textLines.forEach((line, index) => {
-        // Calculate vertical position for each line
-        // For 2 lines: first line slightly above center, second line slightly below
-        const lineOffset = index - (textLines.length - 1) / 2
-        const y = canvas.height / 2 + lineOffset * fontSize * lineHeight
-        
+        const y = startY + index * fontSize * lineHeight
         ctx.fillText(line, canvas.width / 2, y)
         
         // Store approximate vertical boundaries for this line
