@@ -288,7 +288,7 @@ export default function TextParticles({
   }, [isMobile, colorArray, textLines, propFontSize, lineHeight])
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-black overflow-hidden">
+    <div className="absolute inset-0 w-full h-full bg-black overflow-hidden">
       <canvas 
         ref={canvasRef} 
         className="w-full h-full touch-none"
